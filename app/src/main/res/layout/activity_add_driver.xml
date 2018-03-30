@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="com.jstech.onestop.firebase.AddDriverActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextNameDriv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:hint="Name" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextExperienceDriv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:inputType="numberDecimal"
+            android:hint="Experience(in years)" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextEmailDriv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:inputType="textEmailAddress"
+            android:hint="Email" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextPhoneDriv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:inputType="phone"
+            android:hint="Phone" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextAddressDriv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:inputType="textPersonName"
+            android:hint="Address" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonAddDriv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="Add Driver" />
+
+
+
+</LinearLayout>

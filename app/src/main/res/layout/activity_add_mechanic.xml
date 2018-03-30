@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="com.jstech.onestop.firebase.AddMechanicActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextNameMech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:hint="Name" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextExperienceMech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:inputType="numberDecimal"
+            android:hint="Experience(in years)" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextEmailMech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:inputType="textEmailAddress"
+            android:hint="Email" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextPhoneMech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:inputType="phone"
+            android:hint="Phone" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextAddressMech"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:inputType="textPersonName"
+            android:hint="Address" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonAddMech"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="Add Mechanic" />
+
+</LinearLayout>

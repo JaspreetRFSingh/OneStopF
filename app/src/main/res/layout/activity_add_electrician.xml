@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical"
+    tools:context="com.jstech.onestop.firebase.AddElectricianActivity">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextNameElec"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_marginTop="16dp"
+            android:hint="Name" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextExperienceElec"
+            android:layout_width="match_parent"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:inputType="numberDecimal"
+            android:hint="Experience(in years)" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextEmailElec"
+            android:layout_width="match_parent"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:inputType="textEmailAddress"
+            android:hint="Email" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextPhoneElec"
+            android:layout_width="match_parent"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:inputType="phone"
+            android:hint="Phone" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/editTextAddressElec"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:ems="10"
+            android:layout_marginTop="16dp"
+            android:inputType="textPersonName"
+            android:hint="Address" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonAddElec"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="Add Electrician" />
+
+</LinearLayout>

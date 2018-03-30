@@ -1,0 +1,63 @@
+package com.jstech.onestop.view.category;
+
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
+import com.jstech.onestop.R;
+import com.jstech.onestop.fetchview.MechanicActivity;
+import com.jstech.onestop.fetchview.category.ActivityShowMechanicType;
+import com.jstech.onestop.firebase.AddMechanicActivity;
+
+import java.util.Arrays;
+
+public class ActivityMechanicType extends AppCompatActivity implements ListView.OnItemClickListener{
+
+    String mechTypeArray[] = {"Cars", "Scooters", "Motorcycles", "Two Wheelers (without gear)", "Bicycles"};
+    ListView mechTypeList;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_mechanic_type);
+
+        ListAdapter listAdapter= new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,mechTypeArray);
+        mechTypeList = (ListView)findViewById(R.id.mechanicTypeListView);
+        mechTypeList.setAdapter(listAdapter);
+        Arrays.sort(mechTypeArray);
+        mechTypeList.setOnItemClickListener(this);
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        Intent intent;
+        intent = new Intent(ActivityMechanicType.this, AddMechanicActivity.class);
+        if(String.valueOf(parent.getItemAtPosition(position)).equals("Two Wheelers (without gear)")) {
+            intent.putExtra("keyMechType", "Two Wheelers (without gear)");
+        }
+
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Bicycles")){
+            intent.putExtra("keyMechType", "Bicycles");
+        }
+
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Scooters")){
+            intent.putExtra("keyMechType", "Scooters");
+        }
+
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Motorcycles")){
+            intent.putExtra("keyMechType", "Motorcycles");
+
+        }
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Cars")){
+            intent.putExtra("keyMechType", "Cars");
+
+        }
+        startActivity(intent);
+    }
+}
