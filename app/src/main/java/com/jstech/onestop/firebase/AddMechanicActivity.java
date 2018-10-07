@@ -1,13 +1,20 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +35,12 @@ public class AddMechanicActivity extends AppCompatActivity implements View.OnCli
     EditText eTxtMechanicPhone;
     EditText eTxtMechanicAddress;
     Button btnAddMech;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -68,6 +81,8 @@ public class AddMechanicActivity extends AppCompatActivity implements View.OnCli
         mechanic = new Mechanic();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationMechanic);
 
         eTxtMechanicAddress = (EditText)findViewById(R.id.editTextAddressMech);
         eTxtMechanicName = (EditText)findViewById(R.id.editTextNameMech);
@@ -76,6 +91,47 @@ public class AddMechanicActivity extends AppCompatActivity implements View.OnCli
         eTxtMechanicPhone = (EditText)findViewById(R.id.editTextPhoneMech);
         btnAddMech = (Button)findViewById(R.id.buttonAddMech);
         btnAddMech.setOnClickListener(this);
+
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddMechanicActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddMechanicActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddMechanicActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
 
 
     }
@@ -98,6 +154,8 @@ public class AddMechanicActivity extends AppCompatActivity implements View.OnCli
         mechanic.setName(name);
         mechanic.setAddress(address);
         mechanic.setExperience(Double.parseDouble(experience));
+        mechanic.setLatitude(latFetch);
+        mechanic.setLongitude(longFetch);
 
 
         mAuth.createUserWithEmailAndPassword(emailf,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -121,12 +179,14 @@ public class AddMechanicActivity extends AppCompatActivity implements View.OnCli
         eTxtMechanicEmail.setText("");
         eTxtMechanicName.setText("");
         eTxtMechanicAddress.setText("");
+        switchLocation.setChecked(false);
+        switchLocation.setText("Add Location");
         Toast.makeText(AddMechanicActivity.this, "New mechanic's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewMechanic(fUser.getUid(),mechanic.getName(), mechanic.getExperience(), mechanic.getEmail(), mechanic.getPhone(), mechanic.getAddress());
+        writeNewMechanic(fUser.getUid(),mechanic.getName(), mechanic.getExperience(), mechanic.getEmail(), mechanic.getPhone(), mechanic.getAddress(), mechanic.getLatitude(), mechanic.getLongitude());
     }
 
-    private void writeNewMechanic(String userId, String mechName, Double mechExperience, String mechEmail ,String mechPhone, String mechAddress) {
-        Mechanic mechanic = new Mechanic(mechName, mechExperience, mechAddress, mechPhone, mechEmail);
+    private void writeNewMechanic(String userId, String mechName, Double mechExperience, String mechEmail ,String mechPhone, String mechAddress, double mechLat, double mechLong) {
+        Mechanic mechanic = new Mechanic(mechName, mechExperience, mechAddress, mechPhone, mechEmail, mechLat, mechLong);
         mDatabase.child("Mechanics").child(mechTypeRcv).child(userId).setValue(mechanic);
     }
 

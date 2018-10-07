@@ -1,13 +1,20 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,9 +36,17 @@ public class AddEventPlannerActivity extends AppCompatActivity implements View.O
     EditText eTxtEPlannerAddress;
     Button btnAddEPlanner;
 
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
+
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     EventPlanner eventPlanner = null;
+    String eventTypeRcv;
 
 
     private ProgressDialog mProgressDialog;
@@ -56,28 +71,73 @@ public class AddEventPlannerActivity extends AppCompatActivity implements View.O
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
-    @Override
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event_planner);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
 
         eventPlanner = new EventPlanner();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+        eventTypeRcv = getIntent().getExtras().getString("keyEventType");
 
-        eTxtEPlannerAddress = (EditText) findViewById(R.id.editTextAddressEvenPl);
-        eTxtEPlannerName = (EditText) findViewById(R.id.editTextNameEvenPl);
-        eTxtEPlannerEmail = (EditText) findViewById(R.id.editTextEmailEvenPl);
-        eTxtEPlannerExperience = (EditText) findViewById(R.id.editTextExperienceEvenPl);
-        eTxtEPlannerPhone = (EditText) findViewById(R.id.editTextPhoneEvenPl);
-        btnAddEPlanner = (Button) findViewById(R.id.buttonAddEvenPl);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationEventPlanner);
+
+        eTxtEPlannerAddress = (EditText)findViewById(R.id.editTextAddressEvenPl);
+        eTxtEPlannerName = (EditText)findViewById(R.id.editTextNameEvenPl);
+        eTxtEPlannerEmail = (EditText)findViewById(R.id.editTextEmailEvenPl);
+        eTxtEPlannerExperience = (EditText)findViewById(R.id.editTextExperienceEvenPl);
+        eTxtEPlannerPhone = (EditText)findViewById(R.id.editTextPhoneEvenPl);
+        btnAddEPlanner = (Button)findViewById(R.id.buttonAddEvenPl);
         btnAddEPlanner.setOnClickListener(this);
+
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddEventPlannerActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddEventPlannerActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddEventPlannerActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
 
     }
 
-    void addEventPlanner() {
+    void addEventPlanner()
+    {
         if (!validateEntries()) {
             return;
         }
@@ -87,19 +147,21 @@ public class AddEventPlannerActivity extends AppCompatActivity implements View.O
         String email = eTxtEPlannerEmail.getText().toString();
         String name = eTxtEPlannerName.getText().toString();
         String address = eTxtEPlannerAddress.getText().toString();
-        String emailf = name.substring(0,name.indexOf(" "))+ ".eventplanner@onestop.com";
         String password = "nobody";
-
+        String emailf = name.substring(0,name.indexOf(" "))+ "."+eventTypeRcv +".eventplanner@onestop.com";
         eventPlanner.setPhone(phone);
         eventPlanner.setEmail(email);
         eventPlanner.setName(name);
         eventPlanner.setAddress(address);
         eventPlanner.setExperience(Double.parseDouble(experience));
+        eventPlanner.setLatitude(latFetch);
+        eventPlanner.setLongitude(longFetch);
 
 
-        mAuth.createUserWithEmailAndPassword(emailf, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(emailf,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
                 hideProgressDialog();
                 if (task.isSuccessful()) {
                     onAuthSuccess(task.getResult().getUser(), eventPlanner);
@@ -114,16 +176,18 @@ public class AddEventPlannerActivity extends AppCompatActivity implements View.O
     private void onAuthSuccess(FirebaseUser fUser, EventPlanner eventPlanner) {
         eTxtEPlannerPhone.setText("");
         eTxtEPlannerExperience.setText("");
-        eTxtEPlannerEmail.setText("");
-        eTxtEPlannerName.setText("");
         eTxtEPlannerAddress.setText("");
-        Toast.makeText(AddEventPlannerActivity.this, "New cook's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewEventPlanner(fUser.getUid(), eventPlanner.getName(), eventPlanner.getExperience(), eventPlanner.getEmail(), eventPlanner.getPhone(), eventPlanner.getAddress());
+        eTxtEPlannerName.setText("");
+        eTxtEPlannerEmail.setText("");
+        switchLocation.setChecked(false);
+        switchLocation.setText("Add Location");
+        Toast.makeText(AddEventPlannerActivity.this, "New event-planner's entry has been added!", Toast.LENGTH_LONG).show();
+        writeNewEventPlanner(fUser.getUid(),eventPlanner.getName(), eventPlanner.getExperience(), eventPlanner.getEmail(), eventPlanner.getPhone(), eventPlanner.getAddress(), eventPlanner.getLatitude(), eventPlanner.getLongitude());
     }
 
-    private void writeNewEventPlanner(String userId, String epName, Double epExperience, String epEmail, String epPhone, String epAddress) {
-        EventPlanner eventPlanner = new EventPlanner(epName, epExperience, epAddress, epPhone, epEmail);
-        mDatabase.child("EventPlanners").child(userId).setValue(eventPlanner);
+    private void writeNewEventPlanner(String userId, String ePlName, Double ePlExperience, String ePlEmail ,String ePlPhone, String ePlAddress, double ePlLat, double ePlLon) {
+        EventPlanner eventPlanner = new EventPlanner(ePlName, ePlExperience, ePlAddress, ePlPhone, ePlEmail, ePlLat, ePlLon);
+        mDatabase.child("EventPlanners").child(eventTypeRcv).child(userId).setValue(eventPlanner);
     }
 
     private boolean validateEntries() {
@@ -161,6 +225,7 @@ public class AddEventPlannerActivity extends AppCompatActivity implements View.O
         }
         return result;
     }
+
     @Override
     public void onClick(View v) {
      addEventPlanner();

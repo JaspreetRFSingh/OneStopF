@@ -22,6 +22,7 @@ public class ActivityDoctorType extends AppCompatActivity implements ListView.On
             "Cardiologist",
             "Cardiovascular surgeon",
             "Colon and rectal surgeon",
+            "Dentist",
             "Dermatologist",
             "Endocrinologist",
             "Forensic pathologist",
@@ -86,6 +87,8 @@ public class ActivityDoctorType extends AppCompatActivity implements ListView.On
         else if(String.valueOf(parent.getItemAtPosition(position)).equals("Colon and rectal surgeon")){
             intent.putExtra("keyDoctorType", "Colon and rectal surgeon");
         }
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Dentist")){
+            intent.putExtra("keyDoctorType", "Dentist");}
         else if(String.valueOf(parent.getItemAtPosition(position)).equals("Dermatologist")){
             intent.putExtra("keyDoctorType", "Dermatologist");
         }

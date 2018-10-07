@@ -2,13 +2,20 @@ package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,6 +38,12 @@ public class AddTeacherActivity extends AppCompatActivity implements View.OnClic
     EditText eTxtTeacherAddress;
     EditText eTxtTeacherQualification;
     Button btnAddTeach;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -72,6 +85,9 @@ public class AddTeacherActivity extends AppCompatActivity implements View.OnClic
         mAuth = FirebaseAuth.getInstance();
         subjectRcv = getIntent().getExtras().getString("keyId");
 
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationTeacher);
+
         eTxtTeacherQualification = (EditText)findViewById(R.id.editTextQualificationTeach);
         eTxtTeacherAddress = (EditText)findViewById(R.id.editTextAddressTeach);
         eTxtTeacherName = (EditText)findViewById(R.id.editTextNameTeach);
@@ -80,6 +96,45 @@ public class AddTeacherActivity extends AppCompatActivity implements View.OnClic
         eTxtTeacherPhone = (EditText)findViewById(R.id.editTextPhoneTeach);
         btnAddTeach = (Button)findViewById(R.id.buttonAddTeacher);
         btnAddTeach.setOnClickListener(this);
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddTeacherActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddTeacherActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddTeacherActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
     }
 
@@ -104,6 +159,8 @@ public class AddTeacherActivity extends AppCompatActivity implements View.OnClic
         teacher.setAddress(address);
         teacher.setQualification(qualification);
         teacher.setExperience(Double.parseDouble(experience));
+        teacher.setLatitude(latFetch);
+        teacher.setLongitude(longFetch);
         mAuth.createUserWithEmailAndPassword(emailf,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -126,12 +183,14 @@ public class AddTeacherActivity extends AppCompatActivity implements View.OnClic
         eTxtTeacherName.setText("");
         eTxtTeacherAddress.setText("");
         eTxtTeacherQualification.setText("");
+        switchLocation.setText("Add Location");
+        switchLocation.setChecked(false);
         Toast.makeText(AddTeacherActivity.this, "New teacher's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewTeacher(fUser.getUid(),teacher.getName(), teacher.getQualification(), teacher.getExperience(), subjectRcv, teacher.getEmail(), teacher.getPhone(), teacher.getAddress());
+        writeNewTeacher(fUser.getUid(),teacher.getName(), teacher.getQualification(), teacher.getExperience(), subjectRcv, teacher.getEmail(), teacher.getPhone(), teacher.getAddress(), teacher.getLatitude(), teacher.getLongitude());
     }
 
-    private void writeNewTeacher(String userId, String teachName, String teachQualification, Double teachExperience, String teachSubject, String teachEmail ,String teachPhone, String teachAddress) {
-        Teacher teacher = new Teacher(teachName, /*teachSubject,*/ teachQualification, teachExperience, teachAddress, teachPhone, teachEmail);
+    private void writeNewTeacher(String userId, String teachName, String teachQualification, Double teachExperience, String teachSubject, String teachEmail ,String teachPhone, String teachAddress, double teachLat, double teachLon) {
+        Teacher teacher = new Teacher(teachName, teachQualification, teachExperience, teachAddress, teachPhone, teachEmail, teachLat, teachLon);
         mDatabase.child("Teachers").child(teachSubject).child(userId).setValue(teacher);
     }
 

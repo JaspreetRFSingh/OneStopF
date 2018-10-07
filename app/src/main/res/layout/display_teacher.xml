@@ -20,7 +20,7 @@
         android:id="@+id/textViewTeacherDisplayQualification"
         android:hint="Qualification"
         android:paddingTop="8dp"
-        android:paddingLeft="14dp"
+        android:paddingLeft="0dp"
         android:textSize="18dp"/>
 
 
@@ -32,23 +32,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
+            android:paddingLeft="0dp"
+            android:layout_gravity="center"
             android:text="Experience: "
-            android:textSize="14dp"/>
+            android:textSize="16dp"/>
 
         <TextView
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:hint="Experience"
+            android:layout_marginRight="18dp"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTeacherDisplayExperience"/>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/textViewTeacherDisplayPhone"
-        android:paddingLeft="30dp"
-        android:hint="Phone"
-        android:textSize="14dp"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="1dp"
+            android:gravity="right"
+            android:drawableLeft="@drawable/phone_dial"
+            android:layout_gravity="center"
+            android:hint="Phone"
+            android:textSize="16dp"/>
     </LinearLayout>
 
 </LinearLayout>

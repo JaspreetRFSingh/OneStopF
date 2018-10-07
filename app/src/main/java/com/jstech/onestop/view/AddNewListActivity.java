@@ -10,6 +10,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.jstech.onestop.R;
 import com.jstech.onestop.firebase.AddBabySitterActivity;
+import com.jstech.onestop.firebase.AddBeauticianActivity;
 import com.jstech.onestop.firebase.AddCarpenterActivity;
 import com.jstech.onestop.firebase.AddCatererActivity;
 import com.jstech.onestop.firebase.AddCookActivity;
@@ -17,12 +18,14 @@ import com.jstech.onestop.firebase.AddDoctorActivity;
 import com.jstech.onestop.firebase.AddDriverActivity;
 import com.jstech.onestop.firebase.AddElectricianActivity;
 import com.jstech.onestop.firebase.AddEventPlannerActivity;
+import com.jstech.onestop.firebase.AddMasseuseActivity;
 import com.jstech.onestop.firebase.AddMechanicActivity;
 import com.jstech.onestop.firebase.AddPainterActivity;
 import com.jstech.onestop.firebase.AddPlumberActivity;
 import com.jstech.onestop.firebase.AddTailorActivity;
 import com.jstech.onestop.view.category.ActivityDoctorType;
 import com.jstech.onestop.view.category.ActivityElectricianType;
+import com.jstech.onestop.view.category.ActivityEventPlannerType;
 import com.jstech.onestop.view.category.ActivityMechanicType;
 import com.jstech.onestop.view.category.TeacherSubjectsActivity;
 
@@ -30,7 +33,7 @@ import java.util.Arrays;
 
 public class AddNewListActivity extends AppCompatActivity implements ListView.OnItemClickListener{
 
-    String []addArray = {"Doctor", "Driver", "Electrician","Plumber", "Cook", "Mechanic", "Teacher", "Tailor", "Painter", "Carpenter", "Baby Sitter", "Event Planner", "Caterer"};
+    String []addArray = {"Doctor", "Beautician", "Driver", "Electrician","Plumber", "Cook", "Mechanic", "Masseuse", "Teacher", "Tailor", "Painter", "Carpenter", "Baby Sitter", "Event Planner", "Caterer"};
 
     ListView listView;
     @Override
@@ -63,6 +66,11 @@ public class AddNewListActivity extends AppCompatActivity implements ListView.On
             intent.putExtra("keyId", "Plumber");
         }
 
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Beautician")){
+            intent = new Intent(AddNewListActivity.this, AddBeauticianActivity.class);
+            intent.putExtra("keyId", "Plumber");
+        }
+
         else if(String.valueOf(parent.getItemAtPosition(position)).equals("Driver")){
             intent = new Intent(AddNewListActivity.this, AddDriverActivity.class);
             intent.putExtra("keyId", "Driver");
@@ -85,6 +93,10 @@ public class AddNewListActivity extends AppCompatActivity implements ListView.On
             intent = new Intent(AddNewListActivity.this, AddCookActivity.class);
             intent.putExtra("keyId", "Cook");
         }
+        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Masseuse")){
+            intent = new Intent(AddNewListActivity.this, AddMasseuseActivity.class);
+            intent.putExtra("keyId", "Masseuse");
+        }
         else if(String.valueOf(parent.getItemAtPosition(position)).equals("Painter")){
             intent = new Intent(AddNewListActivity.this, AddPainterActivity.class);
             intent.putExtra("keyId", "Painter");
@@ -106,7 +118,7 @@ public class AddNewListActivity extends AppCompatActivity implements ListView.On
 
         }
         else if(String.valueOf(parent.getItemAtPosition(position)).equals("Event Planner")){
-            intent = new Intent(AddNewListActivity.this, AddEventPlannerActivity.class);
+            intent = new Intent(AddNewListActivity.this, ActivityEventPlannerType.class);
             intent.putExtra("keyId", "Event Planner");
         }
         startActivity(intent);

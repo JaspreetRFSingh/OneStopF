@@ -17,20 +17,20 @@ import android.widget.TextView;
 
 import com.jstech.onestop.R;
 import com.jstech.onestop.controller.AdapterServiceType;
+import com.jstech.onestop.controller.AdapterTeacherType;
 import com.jstech.onestop.controller.ListServiceType;
 import com.jstech.onestop.fetchview.TeacherActivity;
 import com.jstech.onestop.model.Teacher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-public class ActivityShowTeacherType extends AppCompatActivity //implements ListView.OnItemClickListener
-{
+public class ActivityShowTeacherType extends AppCompatActivity {
 
     TextView txtSearchTeacher;
     EditText eTxtSearchTeacherType;
     ArrayList<ListServiceType> typeArrayList;
     RecyclerView rview;
-    AdapterServiceType adapter;
+    AdapterTeacherType adapter;
 
 
     void initTypes()
@@ -79,7 +79,7 @@ public class ActivityShowTeacherType extends AppCompatActivity //implements List
         typeArrayList.add(l19);
         typeArrayList.add(l20);
         typeArrayList.add(l21);
-        adapter = new AdapterServiceType(typeArrayList, this);
+        adapter = new AdapterTeacherType(typeArrayList, this);
         rview.setLayoutManager(new LinearLayoutManager(this));
         rview.setAdapter(adapter);
     }
@@ -120,83 +120,5 @@ public class ActivityShowTeacherType extends AppCompatActivity //implements List
 
             }
         });
-
     }
-
-    /*@Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        Intent intent;
-        intent = new Intent(ActivityShowTeacherType.this, TeacherActivity.class);
-        if(String.valueOf(parent.getItemAtPosition(position)).equals("Accountancy")) {
-            intent.putExtra("keyShowTeacherType", "Accountancy");
-        }
-
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Biology")){
-            intent.putExtra("keyShowTeacherType", "Biology");
-        }
-
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Business Studies")){
-            intent.putExtra("keyShowTeacherType", "Business Studies");
-        }
-
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("C++")){
-            intent.putExtra("keyShowTeacherType", "C++");
-
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Chemistry")){
-            intent.putExtra("keyShowTeacherType", "Chemistry");
-
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Economics")){
-            intent.putExtra("keyShowTeacherType", "Economics");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("English")){
-            intent.putExtra("keyShowTeacherType", "English");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Hindi")){
-            intent.putExtra("keyShowTeacherType", "Hindi");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Java")){
-            intent.putExtra("keyShowTeacherType", "Java");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Mathematics")){
-            intent.putExtra("keyShowTeacherType", "Mathematics");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Physics")){
-            intent.putExtra("keyShowTeacherType", "Physics");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("Punjabi")){
-            intent.putExtra("keyShowTeacherType", "Punjabi");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("SBI PO")){
-            intent.putExtra("keyShowTeacherType", "SBI PO");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("SSC")){
-            intent.putExtra("keyShowTeacherType", "SSC");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("UPSC")){
-            intent.putExtra("keyShowTeacherType", "UPSC");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("CAT")){
-            intent.putExtra("keyShowTeacherType", "CAT");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("GATE")){
-            intent.putExtra("keyShowTeacherType", "GATE");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("UGC NET")){
-            intent.putExtra("keyShowTeacherType", "UGC NET");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("IELTS")){
-            intent.putExtra("keyShowTeacherType", "IELTS");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("GRE")){
-            intent.putExtra("keyShowTeacherType", "GRE");
-        }
-        else if(String.valueOf(parent.getItemAtPosition(position)).equals("TOEFL")){
-            intent.putExtra("keyShowTeacherType", "TOEFL");
-        }
-        startActivity(intent);
-
-    }*/
 }

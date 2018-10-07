@@ -79,7 +79,7 @@ public class AdapterTeacherType extends RecyclerView.Adapter<AdapterTeacherType.
 
             int pos = getAdapterPosition();
             ListServiceType listServiceType = this.listServiceTypes.get(pos);
-            Intent intent = new Intent(ctx, TeacherActivity.class);
+            Intent intent = new Intent(ctx,TeacherActivity.class);
 
             if(listServiceType.getType().equals("Accountancy")) {
                 intent.putExtra("keyShowTeacherType", "Accountancy");

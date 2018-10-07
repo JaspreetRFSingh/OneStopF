@@ -1,13 +1,20 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +35,13 @@ public class AddBabySitterActivity extends AppCompatActivity implements View.OnC
     EditText eTxtBabySitterPhone;
     EditText eTxtBabySitterAddress;
     Button btnAddBabySitter;
+
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -62,12 +76,12 @@ public class AddBabySitterActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_baby_sitter);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
-
         babySitter = new BabySitter();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationBabySitter);
 
         eTxtBabySitterAddress = (EditText) findViewById(R.id.editTextAddressBabyS);
         eTxtBabySitterName = (EditText) findViewById(R.id.editTextNameBabyS);
@@ -76,6 +90,46 @@ public class AddBabySitterActivity extends AppCompatActivity implements View.OnC
         eTxtBabySitterPhone = (EditText) findViewById(R.id.editTextPhoneBabyS);
         btnAddBabySitter = (Button) findViewById(R.id.buttonAddBabyS);
         btnAddBabySitter.setOnClickListener(this);
+
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddBabySitterActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddBabySitterActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddBabySitterActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
     }
 
@@ -99,6 +153,9 @@ public class AddBabySitterActivity extends AppCompatActivity implements View.OnC
         babySitter.setAddress(address);
         babySitter.setExperience(Double.parseDouble(experience));
 
+        babySitter.setLatitude(latFetch);
+        babySitter.setLongitude(longFetch);
+
 
         mAuth.createUserWithEmailAndPassword(emailf, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -120,12 +177,14 @@ public class AddBabySitterActivity extends AppCompatActivity implements View.OnC
         eTxtBabySitterEmail.setText("");
         eTxtBabySitterName.setText("");
         eTxtBabySitterAddress.setText("");
+        switchLocation.setHint("Add Location");
+        switchLocation.setChecked(false);
         Toast.makeText(AddBabySitterActivity.this, "New baby-sitter's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewBabySitter(fUser.getUid(), babySitter.getName(), babySitter.getExperience(), babySitter.getEmail(), babySitter.getPhone(), babySitter.getAddress());
+        writeNewBabySitter(fUser.getUid(), babySitter.getName(), babySitter.getExperience(), babySitter.getEmail(), babySitter.getPhone(), babySitter.getAddress(), babySitter.getLatitude(), babySitter.getLongitude());
     }
 
-    private void writeNewBabySitter(String userId, String babySitterName, Double babySitterExperience, String babySitterEmail, String babySitterPhone, String babySitterAddress) {
-        BabySitter babySitter = new BabySitter(babySitterName, babySitterExperience, babySitterAddress, babySitterPhone, babySitterEmail);
+    private void writeNewBabySitter(String userId, String babySitterName, Double babySitterExperience, String babySitterEmail, String babySitterPhone, String babySitterAddress, double babySitterLat, double babySitterLon) {
+        BabySitter babySitter = new BabySitter(babySitterName, babySitterExperience, babySitterAddress, babySitterPhone, babySitterEmail, babySitterLat, babySitterLon);
         mDatabase.child("BabySitters").child(userId).setValue(babySitter);
     }
 

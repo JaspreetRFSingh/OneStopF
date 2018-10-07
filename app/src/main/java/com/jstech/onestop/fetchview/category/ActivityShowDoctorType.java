@@ -41,6 +41,7 @@ public class ActivityShowDoctorType extends AppCompatActivity{
         ListServiceType l4 = new ListServiceType("Cardiologist");
         ListServiceType l5 = new ListServiceType("Cardiovascular surgeon");
         ListServiceType l6 = new ListServiceType("Colon and rectal surgeon");
+        ListServiceType l6b = new ListServiceType("Dentist");
         ListServiceType l7 = new ListServiceType("Dermatologist");
         ListServiceType l8 = new ListServiceType("Endocrinologist");
         ListServiceType l9 = new ListServiceType("Forensic pathologist");
@@ -74,6 +75,7 @@ public class ActivityShowDoctorType extends AppCompatActivity{
         typeArrayList.add(l4);
         typeArrayList.add(l5);
         typeArrayList.add(l6);
+        typeArrayList.add(l6b);
         typeArrayList.add(l7);
         typeArrayList.add(l8);
         typeArrayList.add(l9);

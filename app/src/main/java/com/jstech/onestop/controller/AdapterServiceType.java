@@ -98,6 +98,9 @@ public class AdapterServiceType extends RecyclerView.Adapter<AdapterServiceType.
             else if(listServiceType.getType().equals("Colon and rectal surgeon")){
                 intent.putExtra("keyShowDoctorType", "Colon and rectal surgeon");
             }
+            else if(listServiceType.getType().equals("Dentist")){
+                intent.putExtra("keyShowDoctorType", "Dentist");
+            }
             else if(listServiceType.getType().equals("Dermatologist")){
                 intent.putExtra("keyShowDoctorType", "Dermatologist");
             }

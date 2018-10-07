@@ -80,6 +80,12 @@
     </android.support.design.widget.TextInputLayout>
 
 
+    <Switch
+        android:id="@+id/addLocationPlumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Add location" />
 
     <Button
         android:id="@+id/buttonAddPlum"

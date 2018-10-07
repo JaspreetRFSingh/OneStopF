@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,6 +26,16 @@
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/txtDirection"
+                android:layout_height="match_parent"
+                android:textSize="14dp"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/location"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:text="@string/direction"/>
             <RatingBar
                 android:id="@+id/ratingBar"
                 style="@android:style/Widget.Material.Light.RatingBar.Small"
@@ -33,20 +44,13 @@
                 android:layout_marginLeft="16dp"
                 android:layout_weight="0.2"
                 android:clickable="false"
+                android:focusable="false"
+                android:layout_gravity="right"
                 android:fitsSystemWindows="false"
                 android:focusableInTouchMode="false"
-                android:isIndicator="false"
+                android:isIndicator="true"
                 android:numStars="5" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="14dp"
-                android:id="@+id/txtReviewAverage"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="12dp"
-                android:hint="reviewAverage"/>
+
         </LinearLayout>
     </LinearLayout>
-
 </android.support.v7.widget.CardView>

@@ -53,8 +53,6 @@ public class ActivityElectricianType extends AppCompatActivity implements ListVi
             intent.putExtra("keyElecType", "Geysers");
 
         }
-
         startActivity(intent);
-
     }
 }

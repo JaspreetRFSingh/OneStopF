@@ -7,7 +7,6 @@
     android:orientation="vertical"
     tools:context="com.jstech.onestop.fetchview.category.ActivityShowTeacherType">
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar_showTeacherType"
         android:layout_width="match_parent"

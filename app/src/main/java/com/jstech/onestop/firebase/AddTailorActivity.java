@@ -1,13 +1,20 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +35,12 @@ public class AddTailorActivity extends AppCompatActivity implements View.OnClick
     EditText eTxtTailorPhone;
     EditText eTxtTailorAddress;
     Button btnAddTailor;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -62,12 +75,11 @@ public class AddTailorActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_tailor);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
-
         tailor = new Tailor();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationTailor);
 
         eTxtTailorAddress = (EditText) findViewById(R.id.editTextAddressTail);
         eTxtTailorName = (EditText) findViewById(R.id.editTextNameTail);
@@ -76,6 +88,45 @@ public class AddTailorActivity extends AppCompatActivity implements View.OnClick
         eTxtTailorPhone = (EditText) findViewById(R.id.editTextPhoneTail);
         btnAddTailor = (Button) findViewById(R.id.buttonAddTail);
         btnAddTailor.setOnClickListener(this);
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddTailorActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddTailorActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddTailorActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
     }
 
@@ -97,6 +148,8 @@ public class AddTailorActivity extends AppCompatActivity implements View.OnClick
         tailor.setName(name);
         tailor.setAddress(address);
         tailor.setExperience(Double.parseDouble(experience));
+        tailor.setLatitude(latFetch);
+        tailor.setLongitude(longFetch);
 
 
         mAuth.createUserWithEmailAndPassword(emailf, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -119,12 +172,14 @@ public class AddTailorActivity extends AppCompatActivity implements View.OnClick
         eTxtTailorEmail.setText("");
         eTxtTailorName.setText("");
         eTxtTailorAddress.setText("");
+        switchLocation.setChecked(false);
+        switchLocation.setText("Add Location");
         Toast.makeText(AddTailorActivity.this, "New tailor's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewTailor(fUser.getUid(), tailor.getName(), tailor.getExperience(), tailor.getEmail(), tailor.getPhone(), tailor.getAddress());
+        writeNewTailor(fUser.getUid(), tailor.getName(), tailor.getExperience(), tailor.getEmail(), tailor.getPhone(), tailor.getAddress(), tailor.getLatitude(), tailor.getLongitude());
     }
 
-    private void writeNewTailor(String userId, String tailName, Double tailExperience, String tailEmail, String tailPhone, String tailAddress) {
-        Tailor tailor = new Tailor(tailName, tailExperience, tailAddress, tailPhone, tailEmail);
+    private void writeNewTailor(String userId, String tailName, Double tailExperience, String tailEmail, String tailPhone, String tailAddress, double tailLat, double tailLon) {
+        Tailor tailor = new Tailor(tailName, tailExperience, tailAddress, tailPhone, tailEmail, tailLat, tailLon);
         mDatabase.child("Tailors").child(userId).setValue(tailor);
     }
 

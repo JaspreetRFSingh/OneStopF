@@ -83,6 +83,12 @@
             android:hint="Address" />
     </android.support.design.widget.TextInputLayout>
 
+    <Switch
+        android:id="@+id/addLocationMechanic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Add location" />
     <Button
         android:id="@+id/buttonAddMech"
         android:layout_width="match_parent"

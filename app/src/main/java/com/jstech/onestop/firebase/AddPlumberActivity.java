@@ -1,14 +1,21 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +36,12 @@ public class AddPlumberActivity extends AppCompatActivity implements View.OnClic
     EditText eTxtPlumberPhone;
     EditText eTxtPlumberAddress;
     Button btnAddPlum;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -63,12 +76,12 @@ public class AddPlumberActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plumber);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
-
         plumber = new Plumber();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationPlumber);
 
         eTxtPlumberAddress = (EditText)findViewById(R.id.editTextAddressPlum);
         eTxtPlumberName = (EditText)findViewById(R.id.editTextNamePlum);
@@ -77,6 +90,45 @@ public class AddPlumberActivity extends AppCompatActivity implements View.OnClic
         eTxtPlumberPhone = (EditText)findViewById(R.id.editTextPhonePlum);
         btnAddPlum = (Button)findViewById(R.id.buttonAddPlum);
         btnAddPlum.setOnClickListener(this);
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddPlumberActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddPlumberActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddPlumberActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
 
     }
 
@@ -99,6 +151,8 @@ public class AddPlumberActivity extends AppCompatActivity implements View.OnClic
         plumber.setName(name);
         plumber.setAddress(address);
         plumber.setExperience(Double.parseDouble(experience));
+        plumber.setLatitude(latFetch);
+        plumber.setLongitude(longFetch);
 
 
         mAuth.createUserWithEmailAndPassword(emailf,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -121,12 +175,14 @@ public class AddPlumberActivity extends AppCompatActivity implements View.OnClic
         eTxtPlumberEmail.setText("");
         eTxtPlumberName.setText("");
         eTxtPlumberAddress.setText("");
+        switchLocation.setText("Add Location");
+        switchLocation.setChecked(false);
         Toast.makeText(AddPlumberActivity.this, "New plumber's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewPlumber(fUser.getUid(),plumber.getName(), plumber.getExperience(), plumber.getEmail(), plumber.getPhone(), plumber.getAddress());
+        writeNewPlumber(fUser.getUid(),plumber.getName(), plumber.getExperience(), plumber.getEmail(), plumber.getPhone(), plumber.getAddress(), plumber.getLatitude(), plumber.getLongitude());
     }
 
-    private void writeNewPlumber(String userId, String plumName, Double plumExperience, String plumEmail ,String plumPhone, String plumAddress) {
-        Plumber plumber = new Plumber(plumName, plumExperience, plumAddress, plumPhone, plumEmail);
+    private void writeNewPlumber(String userId, String plumName, Double plumExperience, String plumEmail ,String plumPhone, String plumAddress, double plumLat, double plumLon) {
+        Plumber plumber = new Plumber(plumName, plumExperience, plumAddress, plumPhone, plumEmail, plumLat, plumLon);
         mDatabase.child("Plumbers").child(userId).setValue(plumber);
     }
 

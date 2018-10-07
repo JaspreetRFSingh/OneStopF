@@ -1,13 +1,20 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +36,12 @@ public class AddCatererActivity extends AppCompatActivity implements View.OnClic
     EditText eTxtCatererPhone;
     EditText eTxtCatererAddress;
     Button btnAddCaterer;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -61,12 +74,16 @@ public class AddCatererActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_caterer);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
+
+        /*mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();*/
 
         caterer = new Caterer();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationCaterer);
 
         eTxtCatererAddress = (EditText) findViewById(R.id.editTextAddressCate);
         eTxtCatererName = (EditText) findViewById(R.id.editTextNameCate);
@@ -75,6 +92,47 @@ public class AddCatererActivity extends AppCompatActivity implements View.OnClic
         eTxtCatererPhone = (EditText) findViewById(R.id.editTextPhoneCate);
         btnAddCaterer = (Button) findViewById(R.id.buttonAddCate);
         btnAddCaterer.setOnClickListener(this);
+
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddCatererActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddCatererActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddCatererActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
     }
 
     void addCaterer() {
@@ -95,6 +153,8 @@ public class AddCatererActivity extends AppCompatActivity implements View.OnClic
         caterer.setName(name);
         caterer.setAddress(address);
         caterer.setExperience(Double.parseDouble(experience));
+        caterer.setLatitude(latFetch);
+        caterer.setLongitude(longFetch);
 
 
         mAuth.createUserWithEmailAndPassword(emailf, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -117,12 +177,14 @@ public class AddCatererActivity extends AppCompatActivity implements View.OnClic
         eTxtCatererEmail.setText("");
         eTxtCatererName.setText("");
         eTxtCatererAddress.setText("");
+        switchLocation.setHint("Add Location");
+        switchLocation.setChecked(false);
         Toast.makeText(AddCatererActivity.this, "New caterer's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewCaterer(fUser.getUid(), caterer.getName(), caterer.getExperience(), caterer.getEmail(), caterer.getPhone(), caterer.getAddress());
+        writeNewCaterer(fUser.getUid(), caterer.getName(), caterer.getExperience(), caterer.getEmail(), caterer.getPhone(), caterer.getAddress(), caterer.getLatitude(), caterer.getLongitude());
     }
 
-    private void writeNewCaterer(String userId, String catererName, Double catererExperience, String catererEmail, String catererPhone, String catererAddress) {
-        Caterer caterer = new Caterer(catererName, catererExperience, catererAddress, catererPhone, catererEmail);
+    private void writeNewCaterer(String userId, String catererName, Double catererExperience, String catererEmail, String catererPhone, String catererAddress, double catererLat, double catererLon) {
+        Caterer caterer = new Caterer(catererName, catererExperience, catererAddress, catererPhone, catererEmail, catererLat, catererLon);
         mDatabase.child("Caterers").child(userId).setValue(caterer);
     }
 

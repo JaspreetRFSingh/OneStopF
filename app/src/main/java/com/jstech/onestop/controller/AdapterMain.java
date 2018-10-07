@@ -6,12 +6,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jstech.onestop.R;
 import com.jstech.onestop.fetchview.BabysitterActivity;
+import com.jstech.onestop.fetchview.BeauticianActivity;
 import com.jstech.onestop.fetchview.CarpenterActivity;
 import com.jstech.onestop.fetchview.CatererActivity;
 import com.jstech.onestop.fetchview.CookActivity;
@@ -19,6 +21,7 @@ import com.jstech.onestop.fetchview.DoctorActivity;
 import com.jstech.onestop.fetchview.DriverActivity;
 import com.jstech.onestop.fetchview.ElectricianActivity;
 import com.jstech.onestop.fetchview.EventPlannerActivity;
+import com.jstech.onestop.fetchview.MasseuseActivity;
 import com.jstech.onestop.fetchview.MechanicActivity;
 import com.jstech.onestop.fetchview.PainterActivity;
 import com.jstech.onestop.fetchview.PlumberActivity;
@@ -26,6 +29,7 @@ import com.jstech.onestop.fetchview.TailorActivity;
 import com.jstech.onestop.fetchview.TeacherActivity;
 import com.jstech.onestop.fetchview.category.ActivityShowDoctorType;
 import com.jstech.onestop.fetchview.category.ActivityShowElectricianType;
+import com.jstech.onestop.fetchview.category.ActivityShowEventPlannerType;
 import com.jstech.onestop.fetchview.category.ActivityShowMechanicType;
 import com.jstech.onestop.fetchview.category.ActivityShowTeacherType;
 import com.jstech.onestop.firebase.AddEventPlannerActivity;
@@ -73,7 +77,6 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolderMain
     public void filter(String str){
 
         data.clear();
-
         if(str.length()==0){
             data.addAll(tempList);
         }else{
@@ -98,7 +101,9 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolderMain
             this.listMains = listMains;
             itemView.setOnClickListener(this);
             imgIcon = (ImageView)itemView.findViewById(R.id.imageView);
+            imgIcon.startAnimation(AnimationUtils.loadAnimation(ctx, R.anim.bounce));
             txtTitle = (TextView) itemView.findViewById(R.id.textViewName);
+            txtTitle.startAnimation(AnimationUtils.loadAnimation(ctx, R.anim.slide_left));
 
         }
 
@@ -144,6 +149,14 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolderMain
                 intent = new Intent(ctx, CookActivity.class);
                 intent.putExtra("keyId", listMain.getName());
             }
+            else if(listMain.getName().equals("Masseuse")){
+                intent = new Intent(ctx, MasseuseActivity.class);
+                intent.putExtra("keyId", listMain.getName());
+            }
+            else if(listMain.getName().equals("Beautician")){
+                intent = new Intent(ctx, BeauticianActivity.class);
+                intent.putExtra("keyId", listMain.getName());
+            }
             else if(listMain.getName().equals("Caterer")){
                 intent = new Intent(ctx, CatererActivity.class);
                 intent.putExtra("keyId", listMain.getName());
@@ -159,7 +172,7 @@ public class AdapterMain extends RecyclerView.Adapter<AdapterMain.ViewHolderMain
                 intent.putExtra("keyId", listMain.getName());
             }
             else if(listMain.getName().equals("Event Planner")){
-                intent = new Intent(ctx, EventPlannerActivity.class);
+                intent = new Intent(ctx, ActivityShowEventPlannerType.class);
                 intent.putExtra("keyId", listMain.getName());
             }
             else if(listMain.getName().equals("Painter")){

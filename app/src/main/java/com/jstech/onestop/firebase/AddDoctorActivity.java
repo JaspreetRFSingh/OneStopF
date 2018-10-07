@@ -1,13 +1,20 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +35,12 @@ public class AddDoctorActivity extends AppCompatActivity implements View.OnClick
     EditText eTxtDoctorPhone;
     EditText eTxtDoctorAddress;
     Button btnAddDoct;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
@@ -67,6 +80,9 @@ public class AddDoctorActivity extends AppCompatActivity implements View.OnClick
         mAuth = FirebaseAuth.getInstance();
         doctTypeRcv = getIntent().getExtras().getString("keyDoctorType");
 
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationDoctor);
+
         eTxtDoctorAddress = (EditText)findViewById(R.id.editTextAddressDoct);
         eTxtDoctorName = (EditText)findViewById(R.id.editTextNameDoct);
         eTxtDoctorEmail = (EditText)findViewById(R.id.editTextEmailDoct);
@@ -74,6 +90,47 @@ public class AddDoctorActivity extends AppCompatActivity implements View.OnClick
         eTxtDoctorPhone = (EditText)findViewById(R.id.editTextPhoneDoct);
         btnAddDoct = (Button)findViewById(R.id.buttonAddDoct);
         btnAddDoct.setOnClickListener(this);
+
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddDoctorActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddDoctorActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddDoctorActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
 
     }
 
@@ -95,6 +152,8 @@ public class AddDoctorActivity extends AppCompatActivity implements View.OnClick
         doctor.setName(name);
         doctor.setAddress(address);
         doctor.setExperience(Double.parseDouble(experience));
+        doctor.setLatitude(latFetch);
+        doctor.setLongitude(longFetch);
 
 
         mAuth.createUserWithEmailAndPassword(emailf,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -118,12 +177,14 @@ public class AddDoctorActivity extends AppCompatActivity implements View.OnClick
         eTxtDoctorEmail.setText("");
         eTxtDoctorName.setText("");
         eTxtDoctorAddress.setText("");
+        switchLocation.setChecked(false);
+        switchLocation.setText("Add Location");
         Toast.makeText(AddDoctorActivity.this, "New doctor's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewDoctor(fUser.getUid(),doctor.getName(), doctor.getExperience(), doctor.getEmail(), doctor.getPhone(), doctor.getAddress());
+        writeNewDoctor(fUser.getUid(),doctor.getName(), doctor.getExperience(), doctor.getEmail(), doctor.getPhone(), doctor.getAddress(), doctor.getLatitude(), doctor.getLongitude());
     }
 
-    private void writeNewDoctor(String userId, String doctName, Double doctExperience, String doctEmail ,String doctPhone, String doctAddress) {
-        Doctor doctor = new Doctor(doctName, doctExperience, doctAddress, doctPhone, doctEmail);
+    private void writeNewDoctor(String userId, String doctName, Double doctExperience, String doctEmail ,String doctPhone, String doctAddress, double doctLat, double doctLon) {
+        Doctor doctor = new Doctor(doctName, doctExperience, doctAddress, doctPhone, doctEmail, doctLat, doctLon);
         mDatabase.child("Doctors").child(doctTypeRcv).child(userId).setValue(doctor);
     }
 

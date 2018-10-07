@@ -1,5 +1,11 @@
 package com.jstech.onestop.view;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Handler;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,8 +19,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.jstech.onestop.Manifest;
 import com.jstech.onestop.R;
 import com.jstech.onestop.controller.AdapterMain;
 import com.jstech.onestop.controller.ListMain;
@@ -29,6 +40,9 @@ public class MainActivity extends AppCompatActivity{
     ArrayList<ListMain> mainArrayList;
     RecyclerView rview;
     AdapterMain adapter;
+
+
+    FirebaseAuth mAuth;
 
     void init(){
         rview = (RecyclerView)findViewById(R.id.recyclerViewMain);
@@ -45,6 +59,8 @@ public class MainActivity extends AppCompatActivity{
         ListMain u11 = new ListMain(R.drawable.eventplanner,"Event Planner");
         ListMain u12 = new ListMain(R.drawable.caterer,"Caterer");
         ListMain u13 = new ListMain(R.drawable.babysitter,"Baby Sitter");
+        ListMain u14 = new ListMain(R.drawable.masseuse, "Masseuse");
+        ListMain u15 = new ListMain(R.drawable.beautician, "Beautician");
 
         mainArrayList = new ArrayList<ListMain>();
         mainArrayList.add(u1);
@@ -60,6 +76,8 @@ public class MainActivity extends AppCompatActivity{
         mainArrayList.add(u11);
         mainArrayList.add(u12);
         mainArrayList.add(u13);
+        mainArrayList.add(u14);
+        mainArrayList.add(u15);
         Arrays.sort(new ArrayList[]{mainArrayList});
         adapter = new AdapterMain(mainArrayList, this);
         rview.setLayoutManager(new LinearLayoutManager(this));
@@ -74,6 +92,68 @@ public class MainActivity extends AppCompatActivity{
         myToolbar.setLogo(R.drawable.app_logo);
         myToolbar.setTitle("OneStop");
         setSupportActionBar(myToolbar);
+
+        mAuth = FirebaseAuth.getInstance();
+        //Permissiion Code start
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                android.Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    android.Manifest.permission.READ_CONTACTS)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{android.Manifest.permission.READ_CONTACTS},
+                        101);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+
+
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        101);
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+
+
+        //Permission Code End
 
         eTxtSearchMain = (EditText)findViewById(R.id.editTextSearchMain);
         txtSearchMain =(TextView)findViewById(R.id.txtSearchMain);
@@ -103,9 +183,8 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         menu.add(0,101,0,"Add Data");
-
+        menu.add(0,102,1,"Sign Out");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -116,7 +195,33 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(MainActivity.this, AddNewListActivity.class);
             startActivity(intent);
         }
+        else if(item.getItemId() == 102)
+        {
+            mAuth.signOut();
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    int doubleBackToExitPressed = 1;
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressed == 2) {
+            finishAffinity();
+            System.exit(0);
+        }
+        else {
+            doubleBackToExitPressed++;
+            Toast.makeText(this, "Press back again to exit!", Toast.LENGTH_SHORT).show();
+        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressed=1;
+            }
+        }, 2000);
     }
 }

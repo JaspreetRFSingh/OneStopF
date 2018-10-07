@@ -1,7 +1,12 @@
 package com.jstech.onestop.firebase;
 
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -35,6 +40,12 @@ public class AddDriverActivity extends AppCompatActivity implements View.OnClick
     EditText eTxtDriverPhone;
     EditText eTxtDriverAddress;
     Button btnAddDriver;
+
+    Switch switchLocation;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    double latFetch;
+    double longFetch;
 
 
     private ProgressDialog mProgressDialog;
@@ -70,6 +81,9 @@ public class AddDriverActivity extends AppCompatActivity implements View.OnClick
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        switchLocation = (Switch) findViewById(R.id.addLocationDriver);
+
         eTxtDriverAddress = (EditText) findViewById(R.id.editTextAddressDriv);
         eTxtDriverName = (EditText) findViewById(R.id.editTextNameDriv);
         eTxtDriverEmail = (EditText) findViewById(R.id.editTextEmailDriv);
@@ -77,6 +91,45 @@ public class AddDriverActivity extends AppCompatActivity implements View.OnClick
         eTxtDriverPhone = (EditText) findViewById(R.id.editTextPhoneDriv);
         btnAddDriver = (Button) findViewById(R.id.buttonAddDriv);
         btnAddDriver.setOnClickListener(this);
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(AddDriverActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(AddDriverActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(AddDriverActivity.this, "Please grant location permissions in settings", Toast.LENGTH_LONG).show();
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                    }
+                }
+            }
+        });
+
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                latFetch = location.getLatitude();
+                longFetch = location.getLongitude();
+                switchLocation.setText(latFetch+", "+longFetch);
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
     }
 
     void addDriver()
@@ -98,6 +151,8 @@ public class AddDriverActivity extends AppCompatActivity implements View.OnClick
         driver.setName(name);
         driver.setAddress(address);
         driver.setExperience(Double.parseDouble(experience));
+        driver.setLatitude(latFetch);
+        driver.setLongitude(longFetch);
 
         mAuth.createUserWithEmailAndPassword(emailf,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -120,11 +175,11 @@ public class AddDriverActivity extends AppCompatActivity implements View.OnClick
         eTxtDriverName.setText("");
         eTxtDriverAddress.setText("");
         Toast.makeText(AddDriverActivity.this, "New driver's entry has been added!", Toast.LENGTH_LONG).show();
-        writeNewDriver(fUser.getUid(),driver.getName(), driver.getExperience(), driver.getEmail(), driver.getPhone(), driver.getAddress());
+        writeNewDriver(fUser.getUid(),driver.getName(), driver.getExperience(), driver.getEmail(), driver.getPhone(), driver.getAddress(), driver.getLatitude(), driver.getLongitude());
     }
 
-    private void writeNewDriver(String userId, String drivName, Double drivExperience, String drivEmail ,String drivPhone, String drivAddress) {
-        Driver driver = new Driver(drivName, drivExperience, drivAddress, drivPhone, drivEmail);
+    private void writeNewDriver(String userId, String drivName, Double drivExperience, String drivEmail ,String drivPhone, String drivAddress, double drivLat, double drivLon) {
+        Driver driver = new Driver(drivName, drivExperience, drivAddress, drivPhone, drivEmail, drivLat, drivLon);
         mDatabase.child("Drivers").child(userId).setValue(driver);
     }
 
